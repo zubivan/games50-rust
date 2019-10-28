@@ -1,13 +1,25 @@
-use super::*;
+use ggez::graphics;
+use ggez::graphics::Rect;
+use ggez::graphics::{DrawParam, WHITE};
+use ggez::nalgebra as na;
+
+use ggez::Context;
+
 use ggez::input::keyboard;
 use ggez::input::keyboard::KeyCode;
+use std::time::Duration;
+
+pub trait GameObject {
+    fn update(&mut self, ctx: &Context, dt: Duration);
+    fn draw(&self, ctx: &mut Context);
+}
 
 pub struct Ball {
-    x: f32,
-    y: f32,
-    d_x: f32,
-    d_y: f32,
-    radius: f32,
+    pub x: f32,
+    pub y: f32,
+    pub d_x: f32,
+    pub d_y: f32,
+    pub radius: f32,
 }
 
 impl Ball {
@@ -22,8 +34,8 @@ impl Ball {
     }
 }
 
-impl traits::GameObject for Ball {
-    fn update(&mut self, _ctx: &Context, dt: time::Duration) {
+impl GameObject for Ball {
+    fn update(&mut self, _ctx: &Context, dt: Duration) {
         self.x += self.d_x * dt.as_secs_f32();
         self.y += self.d_y * dt.as_secs_f32();
     }
@@ -42,12 +54,13 @@ impl traits::GameObject for Ball {
     }
 }
 
-const PADDLE_SPEED: i32 = 200;
+const PADDLE_SPEED: i32 = 300;
+
 pub struct Paddle {
-    x: f32,
-    y: f32,
-    width: f32,
-    heigh: f32,
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub heigh: f32,
     up_key: KeyCode,
     down_key: KeyCode,
 }
@@ -65,8 +78,8 @@ impl Paddle {
     }
 }
 
-impl traits::GameObject for Paddle {
-    fn update(&mut self, ctx: &Context, dt: time::Duration) {
+impl GameObject for Paddle {
+    fn update(&mut self, ctx: &Context, dt: Duration) {
         let d_y = if keyboard::is_key_pressed(ctx, self.up_key) {
             -PADDLE_SPEED as f32
         } else if keyboard::is_key_pressed(ctx, self.down_key) {
