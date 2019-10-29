@@ -1,3 +1,8 @@
+#[cfg(not(target_arch = "wasm32"))]
+extern crate ggez;
+#[cfg(target_arch = "wasm32")]
+extern crate good_web_game as ggez;
+
 use ggez::graphics;
 use ggez::graphics::Rect;
 use ggez::graphics::{DrawParam, WHITE};
@@ -6,7 +11,7 @@ use ggez::nalgebra as na;
 use ggez::Context;
 
 use ggez::input::keyboard;
-use ggez::input::keyboard::KeyCode;
+use ggez::event::KeyCode;
 use std::time::Duration;
 
 pub trait GameObject {
@@ -40,17 +45,17 @@ impl GameObject for Ball {
         self.y += self.d_y * dt.as_secs_f32();
     }
     fn draw(&self, ctx: &mut Context) {
-        let circle = graphics::Mesh::new_circle(
-            ctx,
-            graphics::DrawMode::fill(),
-            na::Point2::new(self.x, self.y),
-            self.radius,
-            2.0,
-            WHITE,
-        )
-        .unwrap();
+        // let circle = graphics::Mesh::new_circle(
+        //     ctx,
+        //     graphics::DrawMode::fill(),
+        //     na::Point2::new(self.x, self.y),
+        //     self.radius,
+        //     2.0,
+        //     WHITE,
+        // )
+        // .unwrap();
 
-        graphics::draw(ctx, &circle, DrawParam::default()).unwrap();
+        // graphics::draw(ctx, &circle, DrawParam::default()).unwrap();
     }
 }
 
@@ -92,9 +97,9 @@ impl GameObject for Paddle {
     }
 
     fn draw(&self, ctx: &mut Context) {
-        let rect = Rect::new(self.x, self.y, self.width, self.heigh);
-        let rect =
-            graphics::Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), rect, WHITE).unwrap();
-        graphics::draw(ctx, &rect, DrawParam::default()).unwrap();
+        // let rect = Rect::new(self.x, self.y, self.width, self.heigh);
+        // let rect =
+        //     graphics::Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), rect, WHITE).unwrap();
+        // graphics::draw(ctx, &rect, DrawParam::default()).unwrap();
     }
 }

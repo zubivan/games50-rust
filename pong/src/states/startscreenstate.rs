@@ -1,5 +1,10 @@
+#[cfg(not(target_arch = "wasm32"))]
+extern crate ggez;
+#[cfg(target_arch = "wasm32")]
+extern crate good_web_game as ggez;
+
 use ggez::input::keyboard;
-use ggez::input::keyboard::KeyCode;
+use ggez::event::KeyCode;
 use ggez::nalgebra::Point2;
 
 use ggez::Context;

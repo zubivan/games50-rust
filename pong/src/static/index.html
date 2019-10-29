@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Image example</title>
+    <style>
+        html,
+        body,
+        canvas {
+            margin: 0px;
+            padding: 0px;
+            width: 1280px;
+            height: 720px;
+            overflow: hidden;
+            position: absolute;
+        }
+
+        #canvas {
+            z-index: 2;
+        }
+
+        #glcanvas {
+            z-index: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" tabindex='1'></canvas>
+    <canvas id="glcanvas"></canvas>
+    <script src="pong.js"></script>
+</body>
+
+</html>

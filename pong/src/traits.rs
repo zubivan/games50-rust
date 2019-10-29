@@ -1,3 +1,8 @@
+#[cfg(not(target_arch = "wasm32"))]
+extern crate ggez;
+#[cfg(target_arch = "wasm32")]
+extern crate good_web_game as ggez;
+
 use ggez::Context;
 use std::time::Duration;
 

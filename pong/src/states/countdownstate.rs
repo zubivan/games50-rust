@@ -1,9 +1,12 @@
-use ggez::nalgebra::Point2;
+#[cfg(not(target_arch = "wasm32"))]
+extern crate ggez;
+#[cfg(target_arch = "wasm32")]
+extern crate good_web_game as ggez;
 
+use ggez::nalgebra::Point2;
 use ggez::Context;
 
 use std::f32;
-
 use std::time::Duration;
 
 use super::gamestate::GameState;
