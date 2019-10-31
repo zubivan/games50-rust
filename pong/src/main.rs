@@ -2,9 +2,6 @@ use ggez;
 use ggez::conf::WindowMode;
 use ggez::event;
 use ggez::graphics;
-
-use ggez::graphics::BLACK;
-
 use ggez::timer;
 use ggez::{Context, GameResult};
 
@@ -41,7 +38,7 @@ impl event::EventHandler for MainState {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx, BLACK);
+        graphics::clear(ctx, graphics::BLACK);
         self.state.draw(ctx);
         graphics::present(ctx)?;
         Ok(())
@@ -49,13 +46,28 @@ impl event::EventHandler for MainState {
 }
 
 pub fn main() -> GameResult<()> {
-    let mut window_mode = WindowMode::default();
-    window_mode.width = constants::WORLD_WIDTH;
-    window_mode.height = constants::WORLD_HEIGHT;
+    let window_mode =
+        WindowMode::default()
+        .resizable(true)
+        .dimensions(constants::WORLD_WIDTH, constants::WORLD_HEIGHT);
+
     let cb = ggez::ContextBuilder::new("Pong", "Ivan Zub (zub.ivan@gmail.com)")
         .window_mode(window_mode)
         .add_resource_path(path::PathBuf::from("./assets"));
     let (ctx, events_loop) = &mut cb.build()?;
+
+    graphics::set_default_filter(ctx, graphics::FilterMode::Nearest);
+
+    graphics::set_screen_coordinates(
+        ctx,
+        graphics::Rect::new(
+            0.,
+            0.,
+            constants::VIRTUAL_WORLD_WIDTH,
+            constants::VIRTUAL_WORLD_HEIGHT,
+        ),
+    )?;
+
     let state = &mut MainState::new();
     event::run(ctx, events_loop, state)
 }

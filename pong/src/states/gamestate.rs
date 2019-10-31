@@ -6,78 +6,82 @@ use ggez::Context;
 
 use std::time::Duration;
 
-use rand::{thread_rng, Rng};
+use rand::{thread_rng, Rng, RngCore};
 
 use super::gameoverstate::{GameOverState, Winner};
 use super::shapes::{Ball, GameObject, Paddle};
 use super::utils;
 
-use crate::constants::{WORLD_HEIGHT, WORLD_WIDTH};
+use crate::constants::{FONT_SIZE, VIRTUAL_WORLD_HEIGHT, VIRTUAL_WORLD_WIDTH};
 use crate::traits::{State, StateWithTransition, Transition};
 
-pub struct GameState {
+const BALL_RADIUS: f32 = 4.;
+const PADDLE_HEIGHT: f32 = 30.;
+const PADDLE_WIDTH: f32 = 6.;
+
+pub struct GameState<'a> {
     ball: Ball,
     player1: Paddle,
     player2: Paddle,
     player_one_score: i32,
     player_two_score: i32,
+    rng: Box<dyn RngCore + 'a>,
     next_round: bool,
 }
 
-impl StateWithTransition for GameState {}
+impl StateWithTransition for GameState<'_> {}
 
-impl GameState {
+impl<'a> GameState<'a> {
     pub fn new() -> Self {
         let mut rng = thread_rng();
         let player_one_serves: bool = rng.gen();
-        let ball_d_x: f32 = if player_one_serves {
-            rng.gen_range(250., 350.)
-        } else {
-            -rng.gen_range(250., 350.)
-        };
-        let ball_d_y: f32 = rng.gen_range(-300., 300.);
+
+        let ball_d_x = rng.gen_range(140., 200.);
+        let ball_d_x: f32 = ball_d_x * if player_one_serves { 1. } else { -1. };
+        let ball_d_y: f32 = rng.gen_range(-50., 50.);
 
         GameState {
             ball: Ball::new(
-                WORLD_WIDTH / 2. - 5.,
-                WORLD_HEIGHT / 2. - 5.,
+                VIRTUAL_WORLD_WIDTH / 2. - BALL_RADIUS / 2.,
+                VIRTUAL_WORLD_HEIGHT / 2. - BALL_RADIUS / 2.,
                 ball_d_x,
                 ball_d_y,
-                10.,
+                BALL_RADIUS,
             ),
             player1: Paddle::new(
                 10.,
-                WORLD_HEIGHT / 2. - 50.,
-                20.,
-                100.,
+                VIRTUAL_WORLD_HEIGHT / 2. - PADDLE_HEIGHT / 2.,
+                PADDLE_WIDTH,
+                PADDLE_HEIGHT,
                 KeyCode::W,
                 KeyCode::S,
             ),
             player2: Paddle::new(
-                WORLD_WIDTH - 30.,
-                WORLD_HEIGHT / 2. - 50.,
-                20.,
-                100.,
+                VIRTUAL_WORLD_WIDTH - PADDLE_WIDTH - 10.,
+                VIRTUAL_WORLD_HEIGHT / 2. - PADDLE_HEIGHT / 2.,
+                PADDLE_WIDTH,
+                PADDLE_HEIGHT,
                 KeyCode::Up,
                 KeyCode::Down,
             ),
             player_one_score: 0,
             player_two_score: 0,
             next_round: false,
+            rng: Box::new(rng),
         }
     }
 }
 
-impl State for GameState {
+impl State for GameState<'_> {
     fn update(&mut self, ctx: &Context, dt: Duration) {
         self.ball.update(ctx, dt);
 
-        let world_rect = Rect::new(0., 0., WORLD_WIDTH, WORLD_HEIGHT);
+        let world_rect = Rect::new(0., 0., VIRTUAL_WORLD_WIDTH, VIRTUAL_WORLD_HEIGHT);
         if let Some(side) = collides_with_boundaries(&mut self.ball, world_rect) {
             match side {
                 Side::Bottom => {
                     self.ball.d_y = -self.ball.d_y;
-                    self.ball.y = WORLD_HEIGHT - self.ball.radius * 2.;
+                    self.ball.y = VIRTUAL_WORLD_HEIGHT - self.ball.radius * 2.;
                 }
                 Side::Top => {
                     self.ball.d_y = -self.ball.d_y;
@@ -93,26 +97,25 @@ impl State for GameState {
                 }
             }
         };
-
-        let mut rng = thread_rng();
         if collides_with_paddle(&self.ball, &self.player1) {
             self.ball.d_x = -self.ball.d_x * 1.03;
-            self.ball.d_y = if self.ball.d_y > 0. {
-                rng.gen_range(10., 300.)
-            } else {
-                -rng.gen_range(10., 300.)
-            };
             self.ball.x = self.player1.x + self.player1.width + self.ball.radius;
+            self.ball.d_y = if self.ball.d_y > 0. {
+                self.rng.gen_range(10., 150.)
+            } else {
+                -self.rng.gen_range(10., 150.)
+            };
         }
 
         if collides_with_paddle(&self.ball, &self.player2) {
             self.ball.d_x = -self.ball.d_x * 1.03;
+            self.ball.x = self.player2.x - self.player1.width - self.ball.radius;
+
             self.ball.d_y = if self.ball.d_y > 0. {
-                rng.gen_range(10., 300.)
+                self.rng.gen_range(10., 150.)
             } else {
-                -rng.gen_range(10., 300.)
+                -self.rng.gen_range(10., 150.)
             };
-            self.ball.x = self.player2.x - self.player1.width;
         }
 
         self.player1.update(ctx, dt);
@@ -126,7 +129,7 @@ impl State for GameState {
     }
 }
 
-impl Transition for GameState {
+impl<'a> Transition for GameState<'a> {
     fn transition(&self) -> Option<Box<dyn StateWithTransition>> {
         let player_one_won = self.player_one_score == 10;
         let player_two_won = self.player_two_score == 10;
@@ -158,14 +161,14 @@ fn draw_score(ctx: &mut Context, player_one_score: i32, player_two_score: i32) {
     utils::draw_text_at_location(
         ctx,
         format!("{}", player_one_score),
-        Point2::new(WORLD_WIDTH / 3., WORLD_HEIGHT / 3.),
-        120.,
+        Point2::new(VIRTUAL_WORLD_WIDTH / 3., VIRTUAL_WORLD_HEIGHT / 3.),
+        FONT_SIZE,
     );
     utils::draw_text_at_location(
         ctx,
         format!("{}", player_two_score),
-        Point2::new(WORLD_WIDTH * 2. / 3., WORLD_HEIGHT / 3.),
-        120.,
+        Point2::new(VIRTUAL_WORLD_WIDTH * 2. / 3., VIRTUAL_WORLD_HEIGHT / 3.),
+        FONT_SIZE,
     );
 }
 

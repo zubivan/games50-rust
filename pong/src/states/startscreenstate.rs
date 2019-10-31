@@ -9,7 +9,7 @@ use super::utils;
 
 use std::time::Duration;
 
-use crate::constants::{WORLD_HEIGHT, WORLD_WIDTH};
+use crate::constants::{SMALL_FONT_SIZE, VIRTUAL_WORLD_HEIGHT, VIRTUAL_WORLD_WIDTH};
 use crate::traits::{State, StateWithTransition, Transition};
 
 pub struct StartScreenState {
@@ -26,8 +26,8 @@ impl State for StartScreenState {
         utils::draw_text_at_location(
             ctx,
             String::from("PRESS SPACE TO START"),
-            Point2::new(WORLD_WIDTH / 2., WORLD_HEIGHT / 2.),
-            80.,
+            Point2::new(VIRTUAL_WORLD_WIDTH / 2., VIRTUAL_WORLD_HEIGHT / 2.),
+            SMALL_FONT_SIZE,
         );
     }
 }

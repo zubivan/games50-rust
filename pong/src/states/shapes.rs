@@ -54,7 +54,7 @@ impl GameObject for Ball {
     }
 }
 
-const PADDLE_SPEED: i32 = 300;
+const PADDLE_SPEED: i32 = 200;
 
 pub struct Paddle {
     pub x: f32,

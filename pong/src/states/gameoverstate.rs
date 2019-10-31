@@ -8,7 +8,7 @@ use std::time::Duration;
 use super::countdownstate::CountdownState;
 use super::utils;
 
-use crate::constants::{WORLD_HEIGHT, WORLD_WIDTH};
+use crate::constants::{FONT_SIZE, VIRTUAL_WORLD_HEIGHT, VIRTUAL_WORLD_WIDTH};
 use crate::traits::{State, StateWithTransition, Transition};
 
 pub struct GameOverState {
@@ -46,8 +46,8 @@ impl State for GameOverState {
                     Winner::PlayerTwo => 2,
                 }
             ),
-            Point2::new(WORLD_WIDTH / 2., WORLD_HEIGHT / 2.),
-            80.,
+            Point2::new(VIRTUAL_WORLD_WIDTH / 2., VIRTUAL_WORLD_HEIGHT / 2.),
+            FONT_SIZE,
         );
     }
 }
