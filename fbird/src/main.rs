@@ -9,7 +9,6 @@ use std::path;
 
 mod constants;
 mod traits;
-
 mod states;
 
 const WINDOW_WIDTH: f32 = 1280.;
@@ -17,7 +16,7 @@ const WINDOW_HEIGHT: f32 = 720.;
 
 struct MainState {
     background: Box<dyn traits::State>,
-    // state: Box<dyn traits::State>,
+    state: Box<dyn traits::StateWithTransition>,
     foreground: Box<dyn traits::State>,
 }
 
@@ -25,6 +24,7 @@ impl MainState {
     pub fn new(ctx: &mut Context) -> MainState {
         MainState {
             background: Box::from(states::background_state::BackgroundState::new(ctx)),
+            state: Box::from(states::game_states::start_screen_state::StartScreenState::new(ctx)),
             foreground: Box::from(states::foreground_state::ForegroundState::new(ctx))
         }
     }
@@ -33,20 +33,20 @@ impl MainState {
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
         let dt = timer::delta(ctx);
-        // self.state.update(ctx, dt);
+        self.state.update(ctx, dt);
         self.background.update(ctx, dt);
 
         self.foreground.update(ctx, dt);
-        // if let Some(new_state) = self.state.transition() {
-        //     self.state = new_state
-        // };
+        if let Some(new_state) = self.state.transition() {
+            self.state = new_state
+        };
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, graphics::BLACK);
         self.background.draw(ctx);
-        //self.state.draw(ctx);
+        self.state.draw(ctx);
         self.foreground.draw(ctx);
         graphics::present(ctx)?;
         Ok(())
