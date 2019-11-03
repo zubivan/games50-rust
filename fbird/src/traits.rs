@@ -10,5 +10,5 @@ pub trait StateWithTransition : State + Transition {
 }
 
 pub trait Transition {
-    fn transition(&mut self) -> Option<Box<dyn StateWithTransition>>;
+    fn transition(&mut self, ctx: &mut Context) -> Option<Box<dyn StateWithTransition>>;
 }

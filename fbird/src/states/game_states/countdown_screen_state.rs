@@ -21,9 +21,9 @@ impl StartScreenState {
 impl StateWithTransition for StartScreenState {}
 
 impl Transition for StartScreenState {
-    fn transition(&mut self) -> Option<Box<dyn StateWithTransition>> {
+    fn transition(&mut self, ctx: &mut Context) -> Option<Box<dyn StateWithTransition>> {
         if self.current_count <= -0.5 {
-            Some(Box::from(super::game_state::GameState::new()))
+            Some(Box::from(super::game_state::GameState::new(ctx)))
         } else {
             None
         }

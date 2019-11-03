@@ -37,7 +37,7 @@ impl event::EventHandler for MainState {
         self.background.update(ctx, dt);
 
         self.foreground.update(ctx, dt);
-        if let Some(new_state) = self.state.transition() {
+        if let Some(new_state) = self.state.transition(ctx) {
             self.state = new_state
         };
         Ok(())

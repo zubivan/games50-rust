@@ -24,7 +24,7 @@ impl StartScreenState {
 impl StateWithTransition for StartScreenState {}
 
 impl Transition for StartScreenState {
-    fn transition(&mut self) -> Option<Box<dyn StateWithTransition>> {
+    fn transition(&mut self, _ctx: &mut Context) -> Option<Box<dyn StateWithTransition>> {
         if self.ready {
             Some(Box::new(
                 super::countdown_screen_state::StartScreenState::new(),
