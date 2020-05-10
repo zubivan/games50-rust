@@ -1,0 +1,19 @@
+name: Compile games
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:      
+      matrix:
+        game_path: [fbird, pong]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: sudo apt-get install libudev-dev libasound2-dev
+      - name: Build ${{ matrix.game_path }}
+        run: cd ${{ matrix.game_path }} && cargo check
+
