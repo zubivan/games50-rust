@@ -3,9 +3,9 @@ name: Compile games
 on: [push, pull_request]
 
 jobs:
-  check:
+  compile:
     runs-on: ubuntu-latest
-    strategy:      
+    strategy:
       matrix:
         game_path: [fbird, pong]
     steps:
@@ -13,7 +13,6 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - run: sudo apt-get install libudev-dev libasound2-dev
+      - run: sudo apt-get update && sudo apt-get install libudev-dev libasound2-dev
       - name: Build ${{ matrix.game_path }}
         run: cd ${{ matrix.game_path }} && cargo check
-
